@@ -1,0 +1,11 @@
+.mat-slide-toggle-content .mat-progress-spinner {
+  float: right;
+}
+
+.toggle-status {
+  display: flex;
+
+  mat-spinner {
+    margin-left: 5px;
+  }
+}

@@ -1,0 +1,40 @@
+<app-loading-spinner *ngIf="!resourcesData"></app-loading-spinner>
+
+<ng-container *ngIf="resourcesData">
+  <app-section header="FHIR Resources Count">
+    <div class="card">
+      <div class="name">Version: </div>
+      <div class="desc">r4</div>
+    </div>
+    <div class="card">
+      <div class="name">Total resources: </div>{{ resourcesData.totalResources | number:'1.0':'en-US' }}
+    </div>
+    <div class="card">
+      <div class="name">Patients: </div>
+      <div class="desc">{{ resourcesData.totalPatients | number:'1.0':'en-US' }}</div>
+    </div>
+    <div class="card">
+      <div class="name">Practitioners: </div>
+      <div class="desc">{{ resourcesData.totalPractitioners | number:'1.0':'en-US'}}</div>
+    </div>
+    <div class="card">
+      <div class="name">Organizations: </div>
+      <div class="desc">{{ resourcesData.totalOrganizations | number:'1.0':'en-US' }}</div>
+    </div>
+
+    <p>Extended Resource Counts</p>
+
+    <fr-table Id="dashboard-table" [config]="tableConfig" [paginatorConfig]="paginatorConfig"
+      [data]="resourcesData.totalAllResources">
+    </fr-table>
+  </app-section>
+
+  <app-section header="Delete All FHIR® Data" *ngIf="currentTenantData.role !== 'read'">
+    <p>Delete all data from your FHIR® Service. This will delete all resources from your service.</p>
+    <p>
+      <button id="btn-delete-fhir-data" mat-raised-button color="warn" (click)="deleteFhirData.emit()">
+        Delete
+      </button>
+    </p>
+  </app-section>
+</ng-container>

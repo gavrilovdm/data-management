@@ -1,0 +1,10 @@
+<app-loading-spinner *ngIf="!importedLogs"></app-loading-spinner>
+
+<ng-container *ngIf="importedLogs">
+  <app-section header="Import Logs">
+    <p>Below is an account of the import jobs that have executed against your FHIR service.</p>
+
+    <fr-table Id="imported-logs-table" [config]="tableConfig" [paginatorConfig]="paginatorConfig" [data]="importedLogs">
+    </fr-table>
+  </app-section>
+</ng-container>

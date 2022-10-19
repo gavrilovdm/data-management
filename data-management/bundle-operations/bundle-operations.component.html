@@ -1,0 +1,18 @@
+<app-bundle-operations-view
+  [importedBundlesData]="importedBundlesData$ | async"
+  [dataAfterValidate]="dataAfterValidate"
+  [shouldBeImportedBundlesCount]="shouldBeImportedBundlesCount"
+  [remainingValidateBundlesCount]="remainingValidateBundlesCount"
+  [importInProgress]="importInProgress$ | async"
+  [currentTenantData]='currentTenantData'
+  (showInfo)="showInfo($event)"
+  (showAlert)="showAlert($event)"
+  (onValidateBundles)="onValidateBundles()"
+  (clearBundles)="clearBundles()"
+  (validateBundles)="validateBundles()"
+  (stopValidateBundles)="stopValidateBundles()"
+  (importBundles)="importBundles()"
+  (stopImportBundles)="stopImportBundles()"
+  (uploadBundle)="uploadBundle($event)"
+  (uploadScenario)="uploadScenario($event)">
+</app-bundle-operations-view>

@@ -1,0 +1,6 @@
+<app-connections-view [sftpStatus]="sftpStatus$ | async"
+                      [sftpConnectionUrl]="sftpConnectionUrl$ | async"
+                      [currentTenantData]='currentTenantData'
+                      (toggleSftpStatus)="toggleSftpStatus()"
+                      (downloadSftpKey)="downloadSftpKey()"
+></app-connections-view>

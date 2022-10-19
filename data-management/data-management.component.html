@@ -1,0 +1,29 @@
+<mat-tab-group animationDuration="0ms">
+  <mat-tab label="Dashboard">
+    <ng-template mat-tab-label><span id="tab-data-management-dashboard">Dashboard</span></ng-template>
+    <ng-template matTabContent>
+      <app-dashboard></app-dashboard>
+    </ng-template>
+  </mat-tab>
+
+  <mat-tab label="Bundle Operations">
+    <ng-template mat-tab-label><span id="tab-data-management-bundle-operations">Bundle Operations</span></ng-template>
+    <ng-template matTabContent>
+      <app-bundle-operations></app-bundle-operations>
+    </ng-template>
+  </mat-tab>
+
+  <mat-tab label="Import Logs">
+    <ng-template mat-tab-label><span id="tab-data-management-import-logs">Import Logs</span></ng-template>
+    <ng-template matTabContent>
+      <app-import-logs></app-import-logs>
+    </ng-template>
+  </mat-tab>
+
+  <mat-tab label="Connections" *ngIf="(user$|async).is_admin">
+    <ng-template mat-tab-label><span id="tab-data-management-connections">Connections</span></ng-template>
+    <ng-template matTabContent>
+      <app-connections></app-connections>
+    </ng-template>
+  </mat-tab>
+</mat-tab-group>

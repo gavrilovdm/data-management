@@ -1,0 +1,55 @@
+<app-loading-spinner *ngIf="!sftpStatus"></app-loading-spinner>
+
+<ng-container *ngIf="sftpStatus">
+  <app-section header="Upload Data with SFTP">
+    <ng-container *ngIf="sftpStatus.status === 'ONLINE'">
+      <p>If you prefer to upload data using a secure SFTP endpoint that is specific to this deployment,
+        you can do so with the SFTP command and credentials below.</p>
+      <p>Once the data has been uploaded, use the Import Bundles section on the Dashboard tab
+        to import the data into the FHIR ® service.</p>
+
+      <p class='text-wrap'>
+        {{ sftpConnectionUrl }}
+        <app-copy-button [copyText]="sftpConnectionUrl" buttonName="copy-btn-sftp-url"></app-copy-button>
+      </p>
+
+      <p><button id="btn-download-sftpkey" mat-raised-button [color]="'primary'" (click)="downloadSftpKey.emit()">Download
+        key</button></p>
+    </ng-container>
+
+    <p><b>SFTP Server Status</b></p>
+    <p>Your SFTP Server must be enabled in order to upload bundles to it. It is disabled by default for security.</p>
+    <p>Enabling and disabling the server will take approximately 5 minutes.</p>
+
+    <ng-container *ngIf="currentTenantData.role !== 'read'">
+
+    </ng-container>
+    <mat-slide-toggle *ngIf="sftpStatus.status === 'OFFLINE'" id="toggle-sftp" [(ngModel)]="sftpStatus.enabled"
+                      (change)="onToggleSftpStatus()"
+                      [disabled]="currentTenantData.role === 'read'">
+        Disabled
+    </mat-slide-toggle>
+
+    <mat-slide-toggle *ngIf="sftpStatus.status === 'STARTING'" id="toggle-sftp" [(ngModel)]="sftpStatus.enabled"
+                      disabled>
+      <div class="toggle-status">
+        Enabling...
+        <mat-spinner diameter="20"></mat-spinner>
+      </div>
+    </mat-slide-toggle>
+
+    <mat-slide-toggle *ngIf="sftpStatus.status === 'ONLINE'" id="toggle-sftp" [(ngModel)]="sftpStatus.enabled"
+                      (change)="onToggleSftpStatus()"
+                      [disabled]="currentTenantData.role === 'read'">
+        Enabled
+    </mat-slide-toggle>
+
+    <mat-slide-toggle *ngIf="sftpStatus.status === 'STOPPING'" id="toggle-sftp" [(ngModel)]="sftpStatus.enabled"
+                      disabled>
+      <div class="toggle-status">
+        Disabling...
+        <mat-spinner diameter="20"></mat-spinner>
+      </div>
+    </mat-slide-toggle>
+  </app-section>
+</ng-container>

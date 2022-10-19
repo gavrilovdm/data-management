@@ -1,0 +1,147 @@
+<app-loading-spinner *ngIf="!importedBundlesData"></app-loading-spinner>
+
+<ng-container *ngIf="importedBundlesData">
+  <app-section header="Import Bundles">
+    <ng-container>
+      <p>You have <b>{{ importedBundlesData.fhir }}</b> bundle(s) that are uploaded and ready to be imported into your
+        FHIR® Service.</p>
+    </ng-container>
+
+    <ng-container *ngIf="importedBundlesData.fhir > 0">
+      <p>You can validate them before importing, import them now, or clear them and upload different bundles.</p>
+    </ng-container>
+
+    <ng-container *ngIf="importedBundlesData.fhir === 0">
+      <p>You must upload bundles below before you can import them into your service.</p>
+    </ng-container>
+
+    <ng-container *ngIf="importInProgress">
+      <p>Import in progress. Imported bundles:
+        <span *ngIf="shouldBeImportedBundlesCount > 0">
+          <b>{{ shouldBeImportedBundlesCount - importedBundlesData.fhir }}</b>
+          of
+          <b>{{ shouldBeImportedBundlesCount }}</b>
+        </span>
+
+        <span *ngIf="!shouldBeImportedBundlesCount || shouldBeImportedBundlesCount === 0">
+          <b>wait for get count of imported bundles...</b>
+        </span>
+      </p>
+      <app-loading-spinner></app-loading-spinner>
+      <p>
+        <button id="btn-stop-import" mat-stroked-button color="accent" (click)="stopImportBundles.emit()">
+          Stop Import
+        </button>
+      </p>
+    </ng-container>
+
+    <ng-container
+      *ngIf="!validateInProgress() && !importInProgress && importedBundlesData.fhir !== 0 && currentTenantData.role !== 'read'">
+      <div fxLayout='column' fxLayout.gt-xs='row' fxLayoutGap='10px' fxLayoutGap.gt-xs="20px">
+        <p [matTooltip]="importedBundlesData.fhir === 0 ? 'Available when bundle uploaded' : null">
+          <button id="btn-clear-bundles" mat-raised-button (click)="clearBundles.emit()"
+            [disabled]="importedBundlesData.fhir === 0">
+            Clear Bundles
+          </button>
+        </p>
+        <p [matTooltip]="importedBundlesData.fhir === 0 ? 'Available when bundle uploaded' : null">
+          <button id="btn-validate-bundles" mat-stroked-button color="accent" (click)="validateBundles.emit()"
+            [disabled]="importedBundlesData.fhir === 0">
+            Validate Bundles
+          </button>
+        </p>
+        <p [matTooltip]="importedBundlesData.fhir === 0 ? 'Available when bundle uploaded' : null">
+          <button id="btn-import-bundles" mat-raised-button (click)="importBundles.emit()" color="primary"
+            [disabled]="importedBundlesData.fhir === 0">
+            Import Bundles
+          </button>
+        </p>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="dataAfterValidate && !validateInProgress()">
+      <p><b>Valid Bundles: {{ dataAfterValidate.validCount }}</b></p>
+
+      <fr-table Id="valid-bundles-table" [config]="validBundlesTableConfig" [paginatorConfig]="paginatorConfig"
+        [data]="dataAfterValidate.validBundles">
+        <div class="table-sub-header" above-table-body-space>
+          <app-loading-spinner *ngIf="!dataAfterValidate.validBundles"></app-loading-spinner>
+        </div>
+      </fr-table>
+
+      <p><b>Invalid Bundles: {{ dataAfterValidate.invalidCount }}</b></p>
+
+      <fr-table Id="invalid-bundles-table" [config]="invalidBundlesTableConfig" [paginatorConfig]="paginatorConfig"
+        [data]="dataAfterValidate.invalidBundles">
+        <div class="table-sub-header" above-table-body-space>
+          <app-loading-spinner *ngIf="!dataAfterValidate.invalidBundles"></app-loading-spinner>
+        </div>
+      </fr-table>
+    </ng-container>
+
+    <ng-container *ngIf="validateInProgress()">
+      <p>Validation in progress. Validated bundles:
+        <span *ngIf="remainingValidateBundlesCount > 0">
+          <b>{{ importedBundlesData.fhir - remainingValidateBundlesCount }}</b>
+          of
+          <b>{{ importedBundlesData.fhir }}</b>
+        </span>
+
+        <span *ngIf="!remainingValidateBundlesCount">
+          <b>wait for get count of remaining bundles...</b>
+        </span>
+      </p>
+      <app-loading-spinner></app-loading-spinner>
+      <p>
+        <button id="btn-stop-validate" *ngIf="currentTenantData.role !== 'read'" mat-stroked-button color="accent"
+          (click)="stopValidateBundles.emit()">
+          Stop Validation
+        </button>
+      </p>
+    </ng-container>
+  </app-section>
+
+  <app-section header="Upload Bundles" *ngIf="currentTenantData.role !== 'read'">
+    <p>
+      Quickly upload FHIR® bundles directly from your browser.
+      You can choose to manually upload bundles or choose a bundle from a selection of pre-populated data sets.
+    </p>
+
+    <p>
+      <button mat-raised-button (click)="!validateInProgress() && !importInProgress
+                ? _bundleFile.click()
+                : showAlert.emit('Please wait for end other process on this page.')">
+        Browse File
+      </button>
+    </p>
+
+    <div class="files-area" *ngIf="filesForUpload.length > 0">
+      <ng-container *ngFor="let file of filesForUpload">
+        <p>{{ file.name }} - {{ file.size * 1 | formatMBytes }} MB</p>
+      </ng-container>
+    </div>
+
+    <form>
+      <input id="bundleFile" #_bundleFile (change)="addFiles($event)" type="file" multiple hidden />
+    </form>
+
+    <div fxLayout="row" fxLayoutGap="20px" *ngIf="filesForUpload.length">
+      <p>
+        <button id="btn-upload-bundle" mat-raised-button color='primary' (click)="upload()"
+          [disabled]="filesForUpload.length === 0">
+          Upload
+        </button>
+      </p>
+      <p>
+        <button id="btn-remove-bundle" mat-stroked-button color='primary' (click)="removeFile()">Remove
+        </button>
+      </p>
+    </div>
+
+
+    <p><b>Choose a bundle from a selection of pre-populated data sets</b></p>
+
+    <fr-table Id="bundles-table" [config]="bundlesTableConfig" [paginatorConfig]="paginatorConfig" [data]="data">
+    </fr-table>
+  </app-section>
+</ng-container>
